@@ -1,0 +1,104 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  //- p Gather a <a href="/new?action=clear">new crowd</a>.
+
+  form(method="post" action="/new")
+    .row
+      .col-md-6.
+        <div class="form-group">
+          <label for="message1">Greeting</label>
+          <input type="text" class="form-control" id="message1" name="message1" aria-describedby="message1help" placeholder="Text before supporter's name..." autocomplete="off">
+          <small id="message1help" class="form-text text-muted">This text is prepended to the supporter's name in the messages.</small>
+        </div>
+        <div class="form-group">
+          <label for="message2">Message</label>
+          <input type="text" class="form-control" id="message2" name="message2" aria-describedby="message2help" placeholder="Text after supporter's name..." autocomplete="off">
+          <small id="message2help" class="form-text text-muted">This text is appended to the supporter's name in the messages.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+      .col-md-6#people-list.
+        <button id="more-people" class="btn btn-primary" style="margin: 10px;">Add 10</button>
+        <button id="show-paste" class="btn btn-primary" style="margin: 10px;">Paste external list.</button>
+        <textarea class="form-control" id="paste-area" rows="3" style="display: none;"></textarea>
+
+      //- each person in people
+      //- <div class="form-row"><div class="form-group col-md-6"><label for="inputPhone0">Name</label><input type="text" class="form-control" id="inputPhone0" autocomplete="off" value="1"></div><div class="form-group col-md-6"><label for="inputEmail0">Phone</label><input type="phone" class="form-control" id="inputEmail0" autocomplete="off" value="a"></div></div>
+
+  script.
+    var counter = 0;
+    function addPersonInput(person) {
+      person = person || {};
+      $('#people-list').append(
+        $('<div class="form-row">' +
+            '<div class="form-group col-md-6">' +
+              '<label for="inputPhone' + counter + '">Name</label>' +
+              '<input type="text" class="form-control" name="inputPhone' + counter + '" autocomplete="off"' + (person.name ? ' value="' + person.name + '"' : '') + '>' +
+            '</div>' +
+            '<div class="form-group col-md-6">' +
+              '<label for="inputEmail' + counter + '">Phone</label>' +
+              '<input type="phone" class="form-control" name="inputEmail' + counter + '" autocomplete="off"' + (person.phone ? ' value="' + person.phone + '"' : '') + '>' +
+            '</div>' +
+          '</div>')
+      );
+      counter += 1;
+    }
+
+
+    $(function() {
+      setTimeout(function() {
+        $('#message1').val("Hi, ")
+        $('#message2').val("! This is a test.");
+        $('#show-paste').click();
+        $('#paste-area').focus();
+      }, 10);
+    });
+
+    $(function() {
+      $('#more-people').on('click', function(event) {
+        event.preventDefault();
+        var count = 10;
+        while (count --> 0) addPersonInput();
+      });
+
+      var pasteHidden = true;
+      $('#show-paste').on('click', function(event) {
+        event.preventDefault();
+        if (pasteHidden) { $('#paste-area').show(); } else { $('#paste-area').hide(); }
+        pasteHidden = !pasteHidden;
+      });
+
+      $('#paste-area').bind({
+        paste: function(e) {
+          var pasteData = e.originalEvent.clipboardData.getData('text/plain');
+          if (!pasteData) {
+            alert("No data pasted!");
+            return;
+          }
+
+          try {
+            var people = pasteData.split("\n").map(function(line) {
+              var fields = line.split("\t");
+              return { name: fields[0], phone: fields[1] };
+            });
+          } catch (e) {
+            alert("Couldn't parse");
+            return;
+          }
+
+          people.forEach(addPersonInput);
+
+          //- console.log(e.originalEvent.clipboardData.types);
+          //- var numTypes = e.originalEvent.clipboardData.types.length;
+          //- for (var i = 0; i < numTypes; i++) {
+          //-   console.log(e.originalEvent.clipboardData.getData(e.originalEvent.clipboardData.types[i]));
+          //- }
+          e.preventDefault();
+        }
+      });
+    });
+
+

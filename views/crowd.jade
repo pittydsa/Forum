@@ -1,0 +1,31 @@
+//- The variables on this one are
+//- 
+//- config: configContents, id
+//- config: message1:, message2:, people: [{name:,phone:}]
+//- 
+//- 
+
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  p Gather a <a href="/new">new crowd</a>.
+  .row
+    .col-md-6
+      p Message 1: <span style="font-family: monospace;">#{config.message1}</span>
+      p Message 2: <span style="font-family: monospace;">#{config.message2}</span>
+
+    .col-md-6
+      table.table.table-bordered.table-hover
+        thead
+          tr
+            th Name
+            th Phone
+            th Preview
+        tbody
+          each person in config.people
+            tr 
+              td= person.name
+              td= person.phone
+              td #{config.message1}#{person.name}#{config.message2}

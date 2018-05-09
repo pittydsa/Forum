@@ -50,10 +50,10 @@ router.post('/new', function postNewForm(req, res, next) {
     message1: req.body.message1,
     message2: req.body.message2,
     people: req.body.people,
-    password: md5(req.body.message1 + req.body.message2).substring(0, 10)
+    password: md5((new Date()) + req.body.message1 + req.body.message2).substring(0, 10)
   };
 
-  var id = md5(req.body.message1 + req.body.message2).substring(10, 25);
+  var id = md5((new Date()) + req.body.message1 + req.body.message2).substring(10, 25);
   var config = path.join(__dirname, '..', 'data', id);
   var configContents = JSON.stringify(configuration, null, 2);
 
